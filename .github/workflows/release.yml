@@ -1,0 +1,62 @@
+name: Windows-Setup bauen
+on:
+  release:
+    types: [published]
+permissions:
+  contents: write
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          architecture: x64
+      - name: Release konfigurieren
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          UPDATE_REPOSITORY: ${{ github.repository }}
+        run: |
+          $version = $env:RELEASE_TAG -replace '^v',''
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw 'Tag muss wie v0.6.0 aussehen' }
+          @{ version = $version; repository = $env:UPDATE_REPOSITORY } | ConvertTo-Json | Set-Content release-config.json -Encoding utf8
+          "BUILD_VERSION=$version" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Abhängigkeiten und Tests
+        shell: pwsh
+        run: |
+          python -m pip install -r requirements.txt
+          if ($LASTEXITCODE -ne 0) { throw 'Abhängigkeiten fehlen' }
+          python -m unittest -q
+          if ($LASTEXITCODE -ne 0) { throw 'Tests fehlgeschlagen' }
+      - name: Windows-App bauen
+        shell: pwsh
+        run: |
+          python -m PyInstaller --noconfirm --windowed --onedir --hidden-import pystray._win32 --add-data 'release-config.json;.' --name BewakeAIDownloadManager --distpath release app.py
+          if ($LASTEXITCODE -ne 0) { throw 'App-Build fehlgeschlagen' }
+          Copy-Item README.txt release/BewakeAIDownloadManager/README.txt
+      - name: Setup bauen
+        shell: pwsh
+        run: |
+          $compiler = 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe'
+          if (-not (Test-Path $compiler)) {
+            choco install innosetup --yes --no-progress
+            if ($LASTEXITCODE -ne 0) { throw 'Setup-Compiler fehlt' }
+          }
+          & $compiler /Q "/DBuildVersion=$env:BUILD_VERSION" /Orelease installer.iss
+          if ($LASTEXITCODE -ne 0) { throw 'Setup-Build fehlgeschlagen' }
+          Compress-Archive -Path release/BewakeAIDownloadManager -DestinationPath release/Bewake-AI-Download-Manager-Windows.zip
+          $setup = 'release/Bewake-AI-Download-Manager-Setup.exe'
+          $hash = (Get-FileHash $setup -Algorithm SHA256).Hash.ToLower()
+          "$hash  Bewake-AI-Download-Manager-Setup.exe" | Set-Content release/SHA256SUMS.txt -Encoding utf8
+      - name: Dateien im Release veröffentlichen
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release upload $env:RELEASE_TAG release/Bewake-AI-Download-Manager-Setup.exe release/Bewake-AI-Download-Manager-Windows.zip release/SHA256SUMS.txt --clobber
+          if ($LASTEXITCODE -ne 0) { throw 'Release-Upload fehlgeschlagen' }
