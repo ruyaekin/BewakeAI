@@ -7,7 +7,7 @@ from core import import_paths
 
 class DesktopTests(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory(); self.root=Path(self.temp.name); self.roaming=self.root/'Roaming'; self.local=self.root/'Local'; self.home=self.root/'Home'
+        self.temp=tempfile.TemporaryDirectory(); self.root=Path(self.temp.name).resolve(); self.roaming=self.root/'Roaming'; self.local=self.root/'Local'; self.home=self.root/'Home'
         self.config=self.roaming/'Comfy Desktop'; self.config.mkdir(parents=True)
         self.shared=self.root/'shared-models'; self.install=self.root/'installs'/'My Install'; self.comfy=self.install/'ComfyUI'; (self.comfy/'models').mkdir(parents=True)
         self.record={'id':'inst-test','name':'Studio','sourceId':'standalone','installPath':str(self.install)}

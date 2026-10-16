@@ -4,7 +4,7 @@ from core import *
 
 class SafetyTests(unittest.TestCase):
     def setUp(self):
-        self.tmp=tempfile.TemporaryDirectory(); self.root=Path(self.tmp.name); self.store=Store(self.root/'state'); self.mover=Mover(self.store)
+        self.tmp=tempfile.TemporaryDirectory(); self.root=Path(self.tmp.name).resolve(); self.store=Store(self.root/'state'); self.mover=Mover(self.store)
     def tearDown(self): self.tmp.cleanup()
     def file(self,name='sample.bin',content=b'hello'):
         p=self.root/name; p.write_bytes(content); return p
