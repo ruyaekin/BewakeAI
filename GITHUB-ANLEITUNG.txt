@@ -1,0 +1,79 @@
+Bewake AI – GitHub und automatische Updates
+===========================================
+Dein Repository: https://github.com/ruyaekin/BewakeAI
+
+1. GITHUB EINMAL VORBEREITEN
+Melde dich mit dem Konto an, das Schreibrechte für dieses Repository hat.
+Das Repository ist öffentlich erreichbar und derzeit noch leer.
+Lade ausschließlich den vorbereiteten Quellcode hoch, keine persönlichen
+Einstellungen, Downloads oder Modell-Dateien. Die hochgeladenen Dateien werden
+öffentlich sichtbar. Für die Update-Funktion muss das Repository öffentlich bleiben.
+
+2. DIE VORBEREITETEN DATEIEN HOCHLADEN
+Bewake-AI-GitHub-Paket.zip entpacken. Im entpackten Ordner liegen app.py,
+requirements.txt, installer.iss und der Ordner .github direkt nebeneinander.
+Im Repository auf Add file > Upload files (bei leerem Repository auf
+uploading an existing file) klicken. Alle Inhalte dieses Ordners hineinziehen,
+einschließlich .github. Nicht die ZIP-Datei selbst und nicht den übergeordneten
+Ordner hochladen. Danach Commit changes bestätigen.
+Kontrolle: app.py muss direkt auf der Startseite des Repositorys liegen und
+.github/workflows/release.yml muss unter genau diesem Pfad vorhanden sein.
+Der Ordner .github gehört zum Paket; eine ZIP als einzelne Datei wird von GitHub
+nicht automatisch entpackt und aktiviert deshalb den Build nicht.
+
+3. ERSTE VERSION VERÖFFENTLICHEN
+Im Repository Releases > Draft a new release öffnen.
+Tag: v0.6.0 eingeben und Create new tag wählen. Ziel: der aktuelle Hauptbranch.
+Titel: Bewake AI Download Manager 0.6.0.
+Kurze Änderungen beschreiben. „Pre-release“ ausgeschaltet lassen.
+Publish release klicken. Das löst den vorbereiteten Windows-Build aus.
+Unter Actions > Windows-Setup bauen auf den grünen Haken warten; das kann
+mehrere Minuten dauern. Bei Fehlern den roten Lauf und den fehlerhaften Schritt
+öffnen. Ist Actions deaktiviert, unter Settings > Actions die offiziellen
+GitHub-Actions zulassen. Der Workflow fordert contents:write für den Upload an.
+
+Der Workflow führt die Tests aus, baut die App und das Setup und hängt an den
+Release automatisch diese Dateien an:
+  Bewake-AI-Download-Manager-Setup.exe
+  Bewake-AI-Download-Manager-Windows.zip
+  SHA256SUMS.txt
+Version und Repository werden aus dem Release automatisch in die App eingebaut.
+Du brauchst für diesen Ablauf keinen eigenen GitHub-Token.
+
+4. RÜYA EINMAL DIE NEUE APP GEBEN
+Die frühere Version 0.5 hat noch keinen Updater und muss einmal manuell auf die
+hier vorbereitete Version 0.6.0 oder die auf GitHub gebaute Version gebracht werden.
+Vor dem Installieren: Rechtsklick auf das bisherige Tray-Symbol > Beenden.
+Dann das neue Setup ausführen. Einstellungen und Download-Ziele bleiben erhalten.
+In Einstellungen > GitHub-Updates steht bereits ruyaekin/BewakeAI.
+„Beim Start und alle 2 Stunden nach Updates suchen“ einschalten.
+Wenn sie die Updates direkt bekommen soll, zusätzlich „Neue Versionen automatisch
+herunterladen und installieren“ aktivieren und speichern. Sonst bekommt sie nur
+einen Hinweis und klickt selbst auf Updates.
+
+5. SPÄTER EIN UPDATE VERTEILEN
+Den geänderten Quellcode im Repository hochladen/committen.
+Danach einen NEUEN Release erstellen: z. B. v0.6.1, später v0.6.2 oder v0.7.0.
+Immer eine höhere Versionsnummer verwenden. Der Workflow übernimmt sie automatisch
+für App und Setup; Versionsdateien müssen dafür nicht von Hand angepasst werden.
+Wieder den grünen Haken unter Actions abwarten. Erst dann ist das Update bereit.
+Rüyas laufende App findet die Version beim nächsten Start oder innerhalb von
+zwei Stunden. Für sofortige Prüfung kann sie auf Updates klicken.
+Bei aktivierter automatischer Installation wird das Setup geladen, per SHA-256
+geprüft und in einer freien Phase installiert. Die App schließt kurz und startet
+anschließend wieder im Tray. Laufende Dateioperationen werden zuerst abgewartet.
+Der PC muss eingeschaltet und online sein; bei geschlossener App wird nicht geprüft.
+
+WICHTIG ZUM AKTUELLEN STAND
+Das GitHub-Paket und die Update-Funktion sind vorbereitet. In diesem Chat wurde
+noch nichts auf deinem GitHub-Konto veröffentlicht. Der komplette Ablauf bis zur
+echten Aktualisierung kann erst mit einem öffentlichen Release getestet werden.
+Prüfsummen schützen gegen beschädigte Downloads; sie sind keine digitale Signatur.
+Das Setup ist weiterhin unsigniert. Private Repositories werden nicht unterstützt.
+Update-Fehler stehen im Protokoll; Installationsfehler zusätzlich unter
+%LOCALAPPDATA%\BewakeAI\update-install.log.
+
+Offizielle Anleitungen:
+https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
+https://docs.github.com/en/repositories/working-with-files/managing-files/adding-a-file-to-a-repository
+https://cli.github.com/manual/gh_release_upload
